@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-c -g -Wall -O3
-LDFLAGS=-lboost_thread
+LDFLAGS=
 INCLUDE=-Iinclude
 SOURCES=$(wildcard src/*.cpp)
 OBJECTS=$(patsubst src/%.cpp, build/%.o, $(SOURCES))
