@@ -1,11 +1,11 @@
 CC=g++
 CFLAGS=-c -g -Wall -O3
-LDFLAGS=-lboost_thread
+LDFLAGS=
 INCLUDE=-Iinclude
 SOURCES=$(wildcard src/*.cpp)
 OBJECTS=$(patsubst src/%.cpp, build/%.o, $(SOURCES))
 
-EXECUTABLE=bufferRing
+EXECUTABLE=producer consumer
 
 all: $(SOURCES) $(EXECUTABLE)
 
@@ -15,4 +15,4 @@ $(EXECUTABLE): $(OBJECTS)
 build/%.o: src/%.cpp
 	$(CC) $(CFLAGS) $(INCLUDE) $< -o $@
 clean:
-	rm -rf build/*.o bufferRing
+	rm -rf build/*.o producer consumer

@@ -62,7 +62,7 @@ public:
 		consumer_init();
 		//set semaphore
 		semun sem_empty_union;
-		sem_empty_union.val=TEXT_SZ;
+		sem_empty_union.val=BUFFER_SIZE;
 		semctl(sem_empty_id, 0, SETVAL, sem_empty_union);
 		semun sem_full_union;
 		sem_full_union.val=0;
@@ -102,7 +102,8 @@ public:
 		}
 	}
 	
-	void produer_close(){
+	void producer_close(){
+		sleep(1);
 		//detach shared memory
 		if(shmdt(shared_memory)==-1){
 			fprintf(stderr, "shmdt failed!\n");
