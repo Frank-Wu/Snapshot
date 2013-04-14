@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-c -g -Wall -O3
+CFLAGS=-Wall -O2
 LDFLAGS=
 INCLUDE=-Iinclude
 SOURCES=$(wildcard src/*.cpp)
@@ -7,12 +7,13 @@ OBJECTS=$(patsubst src/%.cpp, build/%.o, $(SOURCES))
 
 EXECUTABLE=producer consumer
 
-all: $(SOURCES) $(EXECUTABLE)
+all: $(EXECUTABLE)
 
-$(EXECUTABLE): $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+producer:
+	$(CC) src/producer.cpp $(INCLUDE) $(CFLAGS) -o producer
 
-build/%.o: src/%.cpp
-	$(CC) $(CFLAGS) $(INCLUDE) $< -o $@
+consumer:
+	$(CC) src/consumer.cpp $(INCLUDE) $(CFLAGS) -o consumer
+
 clean:
 	rm -rf build/*.o producer consumer

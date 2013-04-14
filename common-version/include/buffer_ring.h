@@ -10,7 +10,6 @@
 #include <sys/sem.h>
 #include <sys/time.h>
 
-const int BUFFER_SIZE=10;
 const key_t SHM_KEY=9000;
 const key_t SEM_FULL_KEY=9001;
 const key_t SEM_EMPTY_KEY=9002;
@@ -22,17 +21,15 @@ union semun{
 };
 
 template <class T>
-struct shared_structure{
-	T buffer[BUFFER_SIZE];
-};
-
-template <class T>
 class Buffer_Ring{
 public:
+	Buffer_Ring(int buffer_size){
+		this->buffer_size=buffer_size;
+	}
 	void consumer_init(){
 		pointer=0;
 		//create shared memory
-		shm_id=shmget(SHM_KEY, sizeof(shared_structure<T>), 0666|IPC_CREAT);
+		shm_id=shmget(SHM_KEY, buffer_size*sizeof(T), 0666|IPC_CREAT);
 		if(shm_id==-1){
 			fprintf(stderr, "shmget failed!\n");
 			exit(EXIT_FAILURE);
@@ -44,7 +41,7 @@ public:
 			fprintf(stderr, "shmat failed!\n");
 			exit(EXIT_FAILURE);
 		}
-		shared_stuff=(shared_structure<T> *)shared_memory;
+		shared_stuff=(T *)shared_memory;
 
 		//create semaphore
 		sem_empty_id=semget(SEM_EMPTY_KEY, 1, 0666|IPC_CREAT);
@@ -62,7 +59,7 @@ public:
 		consumer_init();
 		//set semaphore
 		semun sem_empty_union;
-		sem_empty_union.val=TEXT_SZ;
+		sem_empty_union.val=buffer_size;
 		semctl(sem_empty_id, 0, SETVAL, sem_empty_union);
 		semun sem_full_union;
 		sem_full_union.val=0;
@@ -71,17 +68,17 @@ public:
 
 	void producer_write(T value){
 		semop(sem_empty_id, &sem_p, 1);
-		shared_stuff->buffer[pointer]=value;
+		shared_stuff[pointer]=value;
 		semop(sem_full_id, &sem_v, 1);
-		pointer=(pointer+1)%BUFFER_SIZE;
+		pointer=(pointer+1)%buffer_size;
 	}
 
 	T consumer_read(){
 		int temp;
 		semop(sem_full_id, &sem_p, 1);
-		temp=shared_stuff->buffer[pointer];
+		temp=shared_stuff[pointer];
 		semop(sem_empty_id, &sem_v, 1);
-		pointer=(pointer+1)%BUFFER_SIZE;
+		pointer=(pointer+1)%buffer_size;
 		return temp;
 	}
 
@@ -102,7 +99,8 @@ public:
 		}
 	}
 	
-	void produer_close(){
+	void producer_close(){
+		sleep(1);
 		//detach shared memory
 		if(shmdt(shared_memory)==-1){
 			fprintf(stderr, "shmdt failed!\n");
@@ -111,6 +109,7 @@ public:
 	}
 
 private:
+	int buffer_size;
 	int pointer;
 	int shm_id;
 	int sem_empty_id;
@@ -118,7 +117,7 @@ private:
 	sembuf sem_p;
 	sembuf sem_v;
 	void *shared_memory;
-	shared_structure<T> *shared_stuff;
+	T *shared_stuff;
 };
 
 #endif
