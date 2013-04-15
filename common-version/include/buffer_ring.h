@@ -10,9 +10,9 @@
 #include <sys/sem.h>
 #include <sys/time.h>
 
-const key_t SHM_KEY=9000;
-const key_t SEM_FULL_KEY=9001;
-const key_t SEM_EMPTY_KEY=9002;
+const key_t SHM_KEY=8006;
+const key_t SEM_FULL_KEY=8007;
+const key_t SEM_EMPTY_KEY=8008;
 
 union semun{
 	int val;
@@ -57,6 +57,7 @@ public:
 	void producer_init(){
 		//all things consumer done should be done
 		consumer_init();
+
 		//set semaphore
 		semun sem_empty_union;
 		sem_empty_union.val=buffer_size;

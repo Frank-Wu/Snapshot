@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]){
 	if(argc!=2){
-		printf("format: %s [buffer_size]", argv[0]);
+		printf("format: %s [buffer_size]\n", argv[0]);
 		return -1;
 	}
 	int buffer_size=atoi(argv[1]);
@@ -15,7 +15,7 @@ int main(int argc, char *argv[]){
 	while(1){
 		++counter;
 		temp=br.consumer_read();
-		if(temp==9999){
+		if(temp==10000){
 			break;
 		}
 	}
