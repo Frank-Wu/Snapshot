@@ -23,8 +23,8 @@ int main(int argc, char *argv[]){
 	gettimeofday(&t2, NULL);
 	double elapsed_time=(t2.tv_sec-t1.tv_sec)+(t2.tv_usec-t1.tv_usec)*1e-6;
 	printf("elapse: %fs\n", elapsed_time);
-	printf("count: %.0f, unit size: %luk\n", counter, sizeof(int));
-	printf("buffer size: %luk, message size: %luk\n", sizeof(int)*buffer_size, sizeof(int)*message_size);
+	printf("count: %.0f, unit size: %luB\n", counter, sizeof(int));
+	printf("buffer size: %luB, message size: %luB\n", sizeof(int)*buffer_size, sizeof(int)*message_size);
 	double throughput=counter*message_size*sizeof(int)/elapsed_time/1000;
 	printf("throughput: %fKB/s\n", throughput);
 	br.close();
