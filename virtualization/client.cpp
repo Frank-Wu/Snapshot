@@ -12,7 +12,7 @@
 #include "../tools/time_measurer.h"
 
 char *state;
-const int kTupleNum=100000000;
+const int kTupleNum=10000000;
 const int kFileSize=kTupleNum*sizeof(int);
 TimeMeasurer timer;
 
@@ -22,12 +22,20 @@ void CreateState(){
 }
 
 void GetHypervisorState(){
-	int fd=open("foo", O_RDWR);
+	int fd=shm_open("shm", O_RDWR, (mode_t)0600);
+	state=(char*)mmap(NULL, kFileSize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+//	memset(state, 0, kFileSize);
+}
+
+void GetMMapState(){
+	int fd=open("foo", O_RDWR|O_CREAT|O_TRUNC, (mode_t)0600);
+	lseek(fd, kFileSize-1, SEEK_SET);
+	write(fd, "", 1);
 	state=(char*)mmap(NULL, kFileSize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	memset(state, 0, kFileSize);
 }
 
-void GetMMapState(){
+void GetPrivateMMapState(){
 	int fd=open("foo", O_RDWR|O_CREAT|O_TRUNC, (mode_t)0600);
 	lseek(fd, kFileSize-1, SEEK_SET);
 	write(fd, "", 1);
@@ -104,12 +112,13 @@ void ProcessRandom(){
 int main(){
 	srand(time(0));
 //	GetMMapState();
-	GetShmState();
+//	GetShmState();
+	GetHypervisorState();
+	printf("obtained hypervisor state!\n");
 	Process();
-	ProcessRandom();
-	CreateState();
-	Process();
-	ProcessRandom();
-	free(state);
+//	ProcessRandom();
+//	CreateState();
+//	Process();
+//	ProcessRandom();
 	return 0;
 }
